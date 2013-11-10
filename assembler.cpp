@@ -1,6 +1,18 @@
 /**
- *Assembler for our own Assembly Language
+ ************************************************************************
+ *						CASS : An Open Source Assembler in C++		v0.1*
+ ************************************************************************
+ *					  **LICENSED UNDER GNU GENERAL PUBLIC LICENSE**
+ *
+ *@description CASS is an open source assembler written in C++ for our
+ *				ISA which is designed during a project in COA Course
+ *@authors 	Shivam Dixit, Ritesh Agrawal, Prasham Gupta, Parag Jain
+ *			Anyone is free to contribute to this project
+ *
+ *
+ ************************************************************************
  */
+
 
 #include<cstdio>
 #include<fstream>
@@ -11,26 +23,26 @@
 #include<iomanip>
 #include<cstdlib>
 
+/**
+ *Macros
+ */
 #define INPUT_WIDTH 50					//Specifies Max length for an instruction
 #define INPUT_HEIGHT 10000				//Specifies Max number of instructions
-#define SYMB_TAB_SIZE 1000
-#define LABEL_SIZE 15
-#define MNEUMONIC_SIZE 5
-#define NUMBER_OF_REG 28
+#define SYMB_TAB_SIZE 1000 				//Specifies size of Symbol Table
+#define LABEL_SIZE 15 					//Specifies max-size of a Label
+#define MNEUMONIC_SIZE 5 				//Specifies max-size of a Mneumonic
+#define NUMBER_OF_REG 28				//Specifies total number of Registers
 
 using namespace std;
-
-//Label wali line cannot contain any other instruction
 
 
 /**
  *Global Variables
  */
 int currentIndex=0,currentRow=0,instructionLocationCounter=0,symbTableCount=0;
-int * asLength;
-char sourceProgram[INPUT_HEIGHT][INPUT_WIDTH];
-bool isEnd;
-int baseAddress=0;
+char sourceProgram[INPUT_HEIGHT][INPUT_WIDTH];		//Array to store source
+bool isEnd;					//To check if End Of File is reached
+int baseAddress=0;			//Base Address of the program after loading into memory
 
 
 /**
@@ -75,8 +87,9 @@ unsigned long long int decToBinary(int );
 
 
 /**
- *Structure for symbol table
- *stores label and ILC
+ *Structure to combine Label and ILC count to store in symbol table
+ *@char Label Name
+ *@int Instruction Location Counter Value
  */
 struct symbol {
 	char  label[LABEL_SIZE];
@@ -85,7 +98,7 @@ struct symbol {
 
 typedef struct symbol symbol;
 
-symbol symbolTable[SYMB_TAB_SIZE];			//Global array to store symbol table, which is array of stuctures
+symbol symbolTable[SYMB_TAB_SIZE];			//Global array to store symbol table
 
 
 /**
@@ -106,6 +119,8 @@ int main(int argc, char const *argv[])
 
 	inputFileName = argv[1];
 	outputFileName = argv[2];
+
+	//Label wali line cannot contain any other instruction
 
 	fileIn.open(inputFileName,ios::in);
 	if(!fileIn)
@@ -128,47 +143,57 @@ int main(int argc, char const *argv[])
 
 	fileIn.close();
 	fileOut.open(outputFileName,ios::out);		//WARNING : This will destroy the previous contents of the file
-	// for(i=0;i<inputNumberOfLines;i++)
-	// {
-	// 	for(j=0;sourceProgram[i][j] !='\0';j++)
-	// 		fileOut<<sourceProgram[i][j];
-	// 	fileOut<<endl;
-	// }
-	// fileOut.close();
 	parse(fileOut);
 	return 0;
 }
 
 
+/**
+ *Function to parse the input file in two passes
+ *@param 	ofstream& fileOut				//Output File stream
+ *@return void
+ */
 void parse(ofstream & fileOut)
 {
 	currentRow = 0;
 	currentIndex =0;
 	//First Pass
 	while(!isEnd)
-		labelScan(fileOut,true);
+		labelScan(fileOut,true);			//Just create symbol table
 
-	currentRow =0;
+	currentRow =0;						//Reverting all the counters to zero
 	currentIndex =0;
 	isEnd = false;
 	instructionLocationCounter = 0;
-	//Pass Pass
+
+	//Second Pass Pass
 	while(!isEnd)
-		labelScan(fileOut,false);
+		labelScan(fileOut,false);			//Write output to the file
 }
 
+
+
 /**
- *Function to eat all whitespaces
+ *Function to skip all whitespaces
+ *
  */
 void eatWhiteSpace(void)
 {
-	while(sourceProgram[currentRow][currentIndex] == ' ')
+	while(sourceProgram[currentRow][currentIndex] == ' ' || sourceProgram[currentRow][currentIndex] == '\t')
 		currentIndex++;
 }
 
+
+
+/**
+ *Function to scan input and detect if it is label or mnemonic
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void labelScan(ofstream & fileOut,bool isFirstPass)
 {
-	if(sourceProgram[currentRow][currentIndex] != ' ')
+	if(sourceProgram[currentRow][currentIndex] != ' ') //Label will not contain any space at the beginning
 	{
 		//Code to generate symbol table
 		if(isFirstPass)
@@ -179,42 +204,58 @@ void labelScan(ofstream & fileOut,bool isFirstPass)
 		currentIndex=0;
 		return;
 	}
-	eatWhiteSpace();
+	eatWhiteSpace();								//Mneumonic will always start with alteast 1 space
 	readMneumonic(fileOut,isFirstPass);
 }
 
+
+
+/**
+ *Function to get Name of Label
+ *@return char * 		//Pointer to Name of Label
+ */
 char * getLabelName()
 {
 	return sourceProgram[currentRow];
 }
 
-char * getMemory()
-{
-	return (char *)malloc(6*sizeof(char));
-}
 
 
-
+/**
+ *Function to insert Label into Symbol Tabel
+ *@param 	char* Name				//Name of Label To be inserted
+ *@return void
+ */
 void insertInSymbolTable(char * name)
 {
 	int i;
-	static int index =0;
-	if(searchSymbolTable(name) != -1)  				//If symbol already exists in symbol table
+	static int index =0;			//To keep an count of index of array "searchSymbolTable"
+
+	if(searchSymbolTable(name) != -1)  				//If Label already exists in symbol table
 	{
-		fprintf(stderr, "Error at line number: %d\n Label Already used\n",currentRow+1);
+		fprintf(stderr, "cass: Error at line number: %d\n Label Already used\n",currentRow+1);
 		exit(1);
 	}
-	symbolTable[index].ILC = instructionLocationCounter;
-	for(i=0;name[i] !=':';i++)
+
+	symbolTable[index].ILC = instructionLocationCounter;	//Using Global ILC
+	for(i=0;name[i] !=':';i++)		//Copying Label Name
 	{
 		symbolTable[index].label[i] =name[i];
 	}
-	symbolTable[index].label[i] = '\0';
+	symbolTable[index].label[i] = '\0'; //Inserting null char at the end
 	index++;
-	symbTableCount = index;
+	symbTableCount = index;		//Global vairable symbTableCount to keep a count of total number of sym
+								//in symbol table
 }
 
 
+
+/**
+ *Function to read a mneumonic
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void readMneumonic(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0;
@@ -227,13 +268,21 @@ void readMneumonic(ofstream & fileOut,bool isFirstPass)
 		mneumonic[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 		currentIndex++;
 	}
-	mneumonic[i] = '\0';
+	mneumonic[i] = '\0';			//Storing mneumonic in array "mneumonic"
 	//Code to compare mnemnonic
-	mneumonicCompare(fileOut,mneumonic,isFirstPass);
+	mneumonicCompare(fileOut,mneumonic,isFirstPass);	//Function to compare given mneumonic
 	currentRow++;
 	currentIndex=0;
 }
 
+
+/**
+ *Function to scan input and detect if it is label or mnemonic
+ *@param 	ofstream& fileOut				//Output File stream
+ *@patam	char* Mneumonic 				//Actual name of mneumonic
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 {
 	if(!strcmp(mnemnonic,"LDR"))
@@ -316,21 +365,28 @@ void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 		interpretHLT(fileOut,isFirstPass);
 	else if(!strcmp(mnemnonic,"NOP"))
 		interpretNOP(fileOut,isFirstPass);
-	else
+	else				//Invalid Mnemonic
 	{
-		printf("Error at line number : %d . Invalid mnemnonic!\n",currentRow+1);
+		fprintf(stderr,"cass: Error at line number : %d\nInvalid mnemnonic!\n",currentRow+1);
 		exit(1);
 	}
 }
 
+
+/**
+ *Function to interpret mneumonic "LDR"
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void interpretLDR(ofstream & fileOut, bool isFirstPass)
 {
 	int i=0;
 	char reg[3],addr[6];
-	char opcode[] = "00000000000";
+	char opcode[] = "00000000000";			//Opcode of "LDR"
 	eatWhiteSpace();
 	instructionLocationCounter+=4;
-	if(!isFirstPass)
+	if(!isFirstPass)						//If second pass
 	{
 		while(1)
 		{
@@ -340,7 +396,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \nInvald", currentRow+1);
 				exit(1);
 			}
 		}
@@ -363,6 +419,12 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 }
 
 
+/**
+ *Function to interpret mneumonic "STR"
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void interpretSTR(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0;
@@ -402,6 +464,14 @@ void interpretSTR(ofstream & fileOut,bool isFirstPass)
 	}
 }
 
+
+
+/**
+ *Function to interpret mneumonic "MAI"
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void interpretMAI(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0;
@@ -1179,65 +1249,23 @@ unsigned long long int decToBinary(int num)
 void regToBinary(ofstream & fileOut, char * reg)
 {
 	const char *registr[] = {
-		"A",
-		"B",
-		"C",
-		"D",
-		"E",
-		"F",
-		"G",
-		"H",
-		"I",
-		"J",
-		"K",
-		"L",
-		"M",
-		"N",
-		"O",
-		"P",
-		"Q",
-		"R",
-		"S",
-		"T",
-		"U",
-		"V",
-		"W",
-		"X",
-		"Y",
-		"Z",
-		"ZA",
-		"ME"
+		"A",		"B",		"C",		"D",
+		"E",		"F",		"G",		"H",
+		"I",		"J",		"K",		"L",
+		"M",		"N",		"O",		"P",
+		"Q",		"R",		"S",		"T",
+		"U",		"V",		"W",		"X",
+		"Y",		"Z",		"ZA",		"ME"
 	};
 
 	const char *opcode[] = {
-		"00000",
-		"00001",
-		"00010",
-		"00011",
-		"00100",
-		"00101",
-		"00110",
-		"00111",
-		"01000",
-		"01001",
-		"01010",
-		"01011",
-		"01100",
-		"01101",
-		"01110",
-		"01111",
-		"10000",
-		"10001",
-		"10010",
-		"10011",
-		"10100",
-		"10101",
-		"10110",
-		"10111",
-		"11000",
-		"11001",
-		"11010",
-		"11011"
+		"00000",		"00001",		"00010",		"00011",
+		"00100",		"00101",		"00110",		"00111",
+		"01000",		"01001",		"01010",		"01011",
+		"01100",		"01101",		"01110",		"01111",
+		"10000",		"10001",		"10010",		"10011",
+		"10100",		"10101",		"10110",		"10111",
+		"11000",		"11001",		"11010",		"11011"
 	};
 
 	for (int i = 0; i < NUMBER_OF_REG ; ++i)
