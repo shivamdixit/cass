@@ -1,6 +1,6 @@
 /**
  ************************************************************************
- *						CASS : An Open Source Assembler in C++		v0.1*
+ *						CASS : An Open Source Assembler in C++	  v0.1  *
  ************************************************************************
  *					  **LICENSED UNDER GNU GENERAL PUBLIC LICENSE**
  *
@@ -48,6 +48,7 @@ int baseAddress=0;			//Base Address of the program after loading into memory
 /**
  *Function declarations
  */
+void stripNewLines(int);
 void parse(ofstream &);
 void eatWhiteSpace(void);
 void labelScan(ofstream &,bool);
@@ -111,9 +112,9 @@ int main(int argc, char const *argv[])
 	ifstream fileIn;
 	ofstream fileOut;
 
-	if(argc !=3)
+	if(argc <3)
 	{
-		printf("Usage: %s input_file output_file\n",argv[0]);
+		printf("cass: Usage: %s input_file output_file\nFor help use %s --help\n",argv[0],argv[0]);
 		return 0;
 	}
 
@@ -125,14 +126,15 @@ int main(int argc, char const *argv[])
 	fileIn.open(inputFileName,ios::in);
 	if(!fileIn)
 	{
-		fprintf(stderr,"Input file not found !!\n");
+		fprintf(stderr,"cass: Input file not found !!\n");
 		return 1;
 	}
 
 	inputNumberOfLines=0;
 	while(1)
 	{
-		fileIn.ignore();
+		if(inputNumberOfLines != 0)
+			fileIn.ignore();
 		fileIn.getline(sourceProgram[inputNumberOfLines],INPUT_WIDTH,'\r');
 		fflush(stdout);
 		fflush(stdin);
@@ -143,9 +145,39 @@ int main(int argc, char const *argv[])
 
 	fileIn.close();
 	fileOut.open(outputFileName,ios::out);		//WARNING : This will destroy the previous contents of the file
+	stripNewLines(inputNumberOfLines);
 	parse(fileOut);
 	return 0;
 }
+
+/**
+ *Function to strip all new lines and comments
+ *Content after ';' is treated as comment
+ */
+void stripNewLines(int numberOfLines)
+{
+	int i,j;
+	int charFlag =0 ;
+	for(i=0;i<=numberOfLines;i++)
+	{
+		charFlag =0;
+		for(j=0;sourceProgram[i][j] != '\0';j++)
+		{
+			if(sourceProgram[i][j] != ' ' && sourceProgram[i][j] != ';' && sourceProgram[i][j] != '\t' && sourceProgram[i][j] != ':')
+				charFlag =1;
+			if(sourceProgram[i][j] == ';')
+			{
+				sourceProgram[i][j] = '\0';
+				break;
+			}
+		}
+		if(!charFlag)
+		{
+			sourceProgram[i][0] = '\0';
+		}
+	}
+}
+
 
 
 /**
@@ -193,10 +225,10 @@ void eatWhiteSpace(void)
  */
 void labelScan(ofstream & fileOut,bool isFirstPass)
 {
-	if(sourceProgram[currentRow][currentIndex] != ' ') //Label will not contain any space at the beginning
+	if(sourceProgram[currentRow][currentIndex] != ' ' && sourceProgram[currentRow][currentIndex] != '\t') //Label will not contain any space at the beginning
 	{
 		//Code to generate symbol table
-		if(isFirstPass)
+		if(isFirstPass && sourceProgram[currentRow][currentIndex] != '\0')
 		{
 			insertInSymbolTable(getLabelName());
 		}
@@ -394,6 +426,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 				break;
 			reg[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
@@ -409,6 +442,16 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == 'h' || sourceProgram[currentRow][currentIndex] == 'H' || sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 		}
 		addr[i] = '\0';
 		fileOut<<opcode;
@@ -440,6 +483,7 @@ void interpretSTR(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -455,6 +499,16 @@ void interpretSTR(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == 'h' || sourceProgram[currentRow][currentIndex] == 'H' || sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 		}
 		addr[i] = '\0';
 		fileOut<<opcode;
@@ -487,6 +541,7 @@ void interpretMAI(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -502,6 +557,16 @@ void interpretMAI(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == 'h' || sourceProgram[currentRow][currentIndex] == 'H' || sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 		}
 		addr[i] = '\0';
 		fileOut<<opcode;
@@ -533,6 +598,7 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -548,6 +614,16 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 		}
 		label[i] = '\0';
 		fileOut<<opcode;
@@ -586,6 +662,12 @@ void interpretJUM(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
+			eatWhiteSpace();
+			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+			}
 		}
 		label[i] = '\0';
 		fileOut<<opcode;
@@ -616,6 +698,12 @@ void interpretJMC(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
+			eatWhiteSpace();
+			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+			}
 		}
 		label[i] = '\0';
 		fileOut<<opcode;
@@ -646,6 +734,12 @@ void interpretJMZ(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
+			eatWhiteSpace();
+			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+			}
 		}
 		label[i] = '\0';
 		fileOut<<opcode;
@@ -676,6 +770,16 @@ void interpretJMP(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 		}
 		label[i] = '\0';
 		fileOut<<opcode;
@@ -705,6 +809,7 @@ void interpretMVR(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -721,6 +826,16 @@ void interpretMVR(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -750,6 +865,7 @@ void interpretADD(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -766,6 +882,16 @@ void interpretADD(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -795,6 +921,7 @@ void interpretSUB(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -811,6 +938,16 @@ void interpretSUB(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -840,6 +977,7 @@ void interpretMUL(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -856,6 +994,16 @@ void interpretMUL(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -885,6 +1033,7 @@ void interpretDIV(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -901,6 +1050,16 @@ void interpretDIV(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -930,6 +1089,7 @@ void interpretMOD(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -946,6 +1106,16 @@ void interpretMOD(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -983,6 +1153,7 @@ void interpretSTI(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -999,6 +1170,16 @@ void interpretSTI(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1028,6 +1209,7 @@ void interpretNOT(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1060,6 +1242,7 @@ void interpretMOI(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1076,6 +1259,16 @@ void interpretMOI(ofstream & fileOut,bool isFirstPass)
 				break;
 			data[i++] = sourceProgram[currentRow][currentIndex];
 			currentIndex++;
+			if(sourceProgram[currentRow][currentIndex] == ' ')
+			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
+				exit(1);
+				}
+				break;
+			}
 			if(i>10)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1111,6 +1304,7 @@ void interpretINC(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1140,6 +1334,7 @@ void interpretDEC(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
@@ -1171,6 +1366,7 @@ void interpretLOP(ofstream & fileOut,bool isFirstPass)
 				break;
 			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
 			currentIndex++;
+			eatWhiteSpace();
 			if(i>2)					//Implement exception handling
 			{
 				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
