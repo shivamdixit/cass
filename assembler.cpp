@@ -1096,7 +1096,6 @@ void interpretMOI(ofstream & fileOut,bool isFirstPass)
  *ADI,SUI,MUI,DVI,MDI,ANI,ORI,
  *
  */
-
 void interpretINC(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0,ILC=0;
@@ -1225,7 +1224,12 @@ void interpretNOP(ofstream & fileOut, bool isFirstPass)
 	}
 }
 
-
+/**
+ *Function to convert "immediate" DECIMAL data(in char form) into 32 bit binary data
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	char* data						//Array of data
+ *@return void
+ */
 void dataToBinary(ofstream & fileOut,char * data)
 {
 	int integer;
@@ -1235,6 +1239,12 @@ void dataToBinary(ofstream & fileOut,char * data)
 	fileOut<<setw(32)<<setfill('0')<<bin;
 }
 
+
+/**
+ *Function to Search symbol table for a label
+ *@param 	char* element				//Label to be searched for
+ *@return ILC of label, -1 if label not found
+ */
 int searchSymbolTable(char * element)
 {
 	int i;
@@ -1246,6 +1256,12 @@ int searchSymbolTable(char * element)
 	return -1;
 }
 
+
+/**
+ *Function to convert decimal number to Binary
+ *@param  int								//Decimal number
+ *@return unsigned long long 				//Binary equivalent of the given data
+ */
 unsigned long long int decToBinary(int num)
 {
 	unsigned long long bin=0,t=1,bit;
@@ -1259,6 +1275,12 @@ unsigned long long int decToBinary(int num)
 	return bin;
 }
 
+/**
+ *Function to convert register to a binary and write the output in file
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	char* reg 						//Name of register
+ *@return void
+ */
 void regToBinary(ofstream & fileOut, char * reg)
 {
 	const char *registr[] = {
@@ -1289,7 +1311,13 @@ void regToBinary(ofstream & fileOut, char * reg)
 }
 
 //Modify the code so that if entered hex is of only 1 or 2 or 3 characters then output must be in 16 bit format only
-void hexToBinary(ofstream & fileOut,char * reg)
+/**
+ *Function to convert 4bit hexadecimal address into 16 bit binary
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param  	char* reg 						//Address pointer
+ *@return void
+ */
+void hexToBinary(ofstream & fileOut,char * reg)			//Its not register, but pointer to address
 {
 	for (int i = 0; reg[i] != '\0' ; ++i)
 	{
