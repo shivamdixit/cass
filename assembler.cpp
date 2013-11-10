@@ -9,6 +9,7 @@
 #include<cstring>
 #include<cstdlib>
 #include<iomanip>
+#include<cstdlib>
 
 #define INPUT_WIDTH 50					//Specifies Max length for an instruction
 #define INPUT_HEIGHT 10000				//Specifies Max number of instructions
@@ -44,14 +45,34 @@ void insertInSymbolTable(char * );
 void readMneumonic(ofstream &,bool );
 void mneumonicCompare(ofstream &, char * , bool );
 void interpretLDR(ofstream &, bool );
-void interpretHLT(ofstream &, bool );
-void interpretJZR(ofstream & ,bool );
-void interpretMAI(ofstream & ,bool );
 void interpretSTR(ofstream & ,bool);
+void interpretMAI(ofstream & ,bool );
+void interpretJZR(ofstream & ,bool );
+void interpretJUM(ofstream &, bool );
+void interpretJMC(ofstream &, bool );
+void interpretJMZ(ofstream &, bool );
+void interpretJMP(ofstream &, bool );
+void interpretMVR(ofstream &, bool );
+void interpretADD(ofstream &, bool );
+void interpretSUB(ofstream &, bool );
+void interpretMUL(ofstream &, bool );
+void interpretDIV(ofstream &, bool );
+void interpretMOD(ofstream &, bool );
+void interpretSTI(ofstream &, bool );
+void interpretNOT(ofstream &, bool );
+void interpretMOI(ofstream &, bool );
+void interpretINC(ofstream &, bool );
+void interpretDEC(ofstream &, bool );
+void interpretLOP(ofstream &, bool );
+void interpretELP(ofstream &, bool );
+void interpretHLT(ofstream &, bool );
+void interpretNOP(ofstream &, bool );
+void dataToBinary(ofstream & ,char * );
 void regToBinary(ofstream &, char * );
 void hexToBinary(ofstream &,char * );
 int searchSymbolTable(char * );
 unsigned long long int decToBinary(int );
+
 
 /**
  *Structure for symbol table
@@ -96,7 +117,10 @@ int main(int argc, char const *argv[])
 	inputNumberOfLines=0;
 	while(1)
 	{
-		fileIn.getline(sourceProgram[inputNumberOfLines],INPUT_WIDTH,'\n');
+		fileIn.ignore();
+		fileIn.getline(sourceProgram[inputNumberOfLines],INPUT_WIDTH,'\r');
+		fflush(stdout);
+		fflush(stdin);
 		if(fileIn.eof())
 			break;
 		inputNumberOfLines++;
@@ -220,26 +244,26 @@ void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 		interpretMAI(fileOut,isFirstPass);
 	else if(!strcmp(mnemnonic,"JZR"))
 		interpretJZR(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"JUM"))
-	// 	interpretJUM(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"JMC"))
-	// 	interpretJMC(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"JMZ"))
-	// 	interpretJMZ(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"JMP"))
-	// 	interpretJMP(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"MVR"))
-	// 	interpretMVR(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"ADD"))
-	// 	interpretADD(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"SUB"))
-	// 	interpretSUB(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"MUL"))
-	// 	interpretMUL(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"DIV"))
-	// 	interpretDIV(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"MOD"))
-	// 	interpretMOD(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"JUM"))
+		interpretJUM(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"JMC"))
+		interpretJMC(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"JMZ"))
+		interpretJMZ(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"JMP"))
+		interpretJMP(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"MVR"))
+		interpretMVR(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"ADD"))
+		interpretADD(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"SUB"))
+		interpretSUB(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"MUL"))
+		interpretMUL(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"DIV"))
+		interpretDIV(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"MOD"))
+		interpretMOD(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"OR2"))
 	// 	interpretOR2(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"AND"))
@@ -248,12 +272,12 @@ void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 	// 	interpretXOR(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"COM"))
 	// 	interpretCOM(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"STI"))
-	// 	interpretSTI(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"NOT"))
-	// 	interpretNOT(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"MOI"))
-	// 	interpretMOI(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"STI"))
+		interpretSTI(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"NOT"))
+		interpretNOT(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"MOI"))
+		interpretMOI(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"ADI"))
 	// 	interpretADI(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"SUI"))
@@ -268,10 +292,10 @@ void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 	// 	interpretANI(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"ORI"))
 	// 	interpretORI(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"INC"))
-	// 	interpretINC(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"DEC"))
-	// 	interpretDEC(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"INC"))
+		interpretINC(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"DEC"))
+		interpretDEC(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"LHS"))
 	// 	interpretLHS(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"RHS"))
@@ -284,17 +308,17 @@ void mneumonicCompare(ofstream & fileOut, char * mnemnonic, bool isFirstPass)
 	// 	interpretOUT(fileOut,isFirstPass);
 	// else if(!strcmp(mnemnonic,"INP"))
 	// 	interpretINP(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"LOP"))
-	// 	interpretLOP(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"ELP"))
-	// 	interpretELP(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"LOP"))
+		interpretLOP(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"ELP"))
+		interpretELP(fileOut,isFirstPass);
 	else if(!strcmp(mnemnonic,"HLT"))
 		interpretHLT(fileOut,isFirstPass);
-	// else if(!strcmp(mnemnonic,"NOP"))
-	// 	interpretNOP(fileOut,isFirstPass);
+	else if(!strcmp(mnemnonic,"NOP"))
+		interpretNOP(fileOut,isFirstPass);
 	else
 	{
-		printf("Error at line number : %d . Invalid Opcode\n",currentRow+1);
+		printf("Error at line number : %d . Invalid mnemnonic!\n",currentRow+1);
 		exit(1);
 	}
 }
@@ -330,6 +354,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
 		}
+		addr[i] = '\0';
 		fileOut<<opcode;
 		regToBinary(fileOut,reg);
 		hexToBinary(fileOut,addr);
@@ -337,19 +362,6 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 	}
 }
 
-void interpretHLT(ofstream & fileOut, bool isFirstPass)
-{
-	char opcode[] = "00000000101000000100001010000001";
-	eatWhiteSpace();
-	instructionLocationCounter+=4;
-
-	if(!isFirstPass)
-	{
-		fileOut<<opcode;
-		fileOut<<endl;
-	}
-	isEnd =true;
-}
 
 void interpretSTR(ofstream & fileOut,bool isFirstPass)
 {
@@ -382,6 +394,7 @@ void interpretSTR(ofstream & fileOut,bool isFirstPass)
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
 		}
+		addr[i] = '\0';
 		fileOut<<opcode;
 		regToBinary(fileOut,reg);
 		hexToBinary(fileOut,addr);
@@ -420,6 +433,7 @@ void interpretMAI(ofstream & fileOut,bool isFirstPass)
 				break;
 			addr[i++] = sourceProgram[currentRow][currentIndex++];
 		}
+		addr[i] = '\0';
 		fileOut<<opcode;
 		regToBinary(fileOut,reg);
 		hexToBinary(fileOut,addr);
@@ -470,6 +484,672 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 		fileOut<<setw(16)<<setfill('0')<<decToBinary(ILC+baseAddress);
 		fileOut<<endl;
 	}
+}
+
+
+void interpretJUM(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char label[LABEL_SIZE];
+	char opcode[] = "0000000010000000";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			label[i++] = sourceProgram[currentRow][currentIndex++];
+		}
+		label[i] = '\0';
+		fileOut<<opcode;
+		ILC = searchSymbolTable(label);
+		if(ILC == -1)
+		{
+			fprintf(stderr,"Error at line number: %d\n Label Not found\n",currentRow+1);
+			exit(1);
+		}
+		fileOut<<setw(16)<<setfill('0')<<decToBinary(ILC+baseAddress);
+		fileOut<<endl;
+	}
+}
+
+void interpretJMC(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char label[LABEL_SIZE];
+	char opcode[] = "0000000010000001";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			label[i++] = sourceProgram[currentRow][currentIndex++];
+		}
+		label[i] = '\0';
+		fileOut<<opcode;
+		ILC = searchSymbolTable(label);
+		if(ILC == -1)
+		{
+			fprintf(stderr,"Error at line number: %d\n Label Not found\n",currentRow+1);
+			exit(1);
+		}
+		fileOut<<setw(16)<<setfill('0')<<decToBinary(ILC+baseAddress);
+		fileOut<<endl;
+	}
+}
+
+void interpretJMZ(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char label[LABEL_SIZE];
+	char opcode[] = "0000000010000010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			label[i++] = sourceProgram[currentRow][currentIndex++];
+		}
+		label[i] = '\0';
+		fileOut<<opcode;
+		ILC = searchSymbolTable(label);
+		if(ILC == -1)
+		{
+			fprintf(stderr,"Error at line number: %d\n Label Not found\n",currentRow+1);
+			exit(1);
+		}
+		fileOut<<setw(16)<<setfill('0')<<decToBinary(ILC+baseAddress);
+		fileOut<<endl;
+	}
+}
+
+void interpretJMP(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char label[LABEL_SIZE];
+	char opcode[] = "0000000010000011";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			label[i++] = sourceProgram[currentRow][currentIndex++];
+		}
+		label[i] = '\0';
+		fileOut<<opcode;
+		ILC = searchSymbolTable(label);
+		if(ILC == -1)
+		{
+			fprintf(stderr,"Error at line number: %d\n Label Not found\n",currentRow+1);
+			exit(1);
+		}
+		fileOut<<setw(16)<<setfill('0')<<decToBinary(ILC+baseAddress);
+		fileOut<<endl;
+	}
+}
+
+void interpretMVR(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000000000";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretADD(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000000001";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretSUB(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000000010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretMUL(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000000011";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretDIV(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000000100";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretMOD(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "000000001010000000010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+
+/**
+ *Skipped :
+ *OR2
+ *AND
+ *XOR
+ *COM
+ */
+void interpretSTI(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3],reg2[3];
+	char opcode[] = "0000000010100000001010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg2[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg2[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		regToBinary(fileOut,reg2);
+		fileOut<<endl;
+	}
+}
+
+void interpretNOT(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3];
+	char opcode[] = "000000001010000001000000000";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		fileOut<<endl;
+	}
+}
+
+
+/**
+ *Immediate data must be in decimal
+ */
+void interpretMOI(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0;
+	char reg1[3],data[12];
+	char opcode[] = "000000001010000001000000001";
+	eatWhiteSpace();
+	instructionLocationCounter+=8;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == ',')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		currentIndex++;
+		eatWhiteSpace();
+		i=0;
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			data[i++] = sourceProgram[currentRow][currentIndex];
+			currentIndex++;
+			if(i>10)					//Implement exception handling
+			{
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		data[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		fileOut<<endl;
+		dataToBinary(fileOut,data);
+		fileOut<<endl;
+	}
+}
+
+/**
+ *Skipped
+ *ADI,SUI,MUI,DVI,MDI,ANI,ORI,
+ *
+ */
+
+void interpretINC(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3];
+	char opcode[] = "000000001010000001000001001";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		fileOut<<endl;
+	}
+}
+
+
+void interpretDEC(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0,ILC=0;
+	char reg1[3];
+	char opcode[] = "000000001010000001000001010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		fileOut<<endl;
+	}
+}
+
+/**
+ *Skipped : LHS,RHS,PSH,POP,OUT,IN
+ */
+void interpretLOP(ofstream & fileOut,bool isFirstPass)
+{
+	int i=0;
+	char reg1[3];
+	char opcode[] = "000000001010000001000010001";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+	if(!isFirstPass)
+	{
+		while(1)
+		{
+			if(sourceProgram[currentRow][currentIndex] == '\0')
+				break;
+			reg1[i++] = toupper(sourceProgram[currentRow][currentIndex]);
+			currentIndex++;
+			if(i>2)					//Implement exception handling
+			{
+				printf("Error at line number : %d \n", currentRow+1);
+				exit(1);
+			}
+		}
+		reg1[i] = '\0';
+		fileOut<<opcode;
+		regToBinary(fileOut,reg1);
+		fileOut<<endl;
+	}
+}
+
+void interpretELP(ofstream & fileOut, bool isFirstPass)
+{
+	char opcode[] = "00000000101000000100001010000000";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+
+	if(!isFirstPass)
+	{
+		fileOut<<opcode;
+		fileOut<<endl;
+	}
+}
+
+void interpretHLT(ofstream & fileOut, bool isFirstPass)
+{
+	char opcode[] = "00000000101000000100001010000001";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+
+	if(!isFirstPass)
+	{
+		fileOut<<opcode;
+		fileOut<<endl;
+	}
+	isEnd =true;
+}
+
+void interpretNOP(ofstream & fileOut, bool isFirstPass)
+{
+	char opcode[] = "00000000101000000100001010000010";
+	eatWhiteSpace();
+	instructionLocationCounter+=4;
+
+	if(!isFirstPass)
+	{
+		fileOut<<opcode;
+		fileOut<<endl;
+	}
+}
+
+
+void dataToBinary(ofstream & fileOut,char * data)
+{
+	int integer;
+	unsigned long long int bin;
+	integer = atoi(data);
+	bin = decToBinary(integer);
+	fileOut<<setw(32)<<setfill('0')<<bin;
 }
 
 int searchSymbolTable(char * element)
@@ -567,7 +1247,7 @@ void regToBinary(ofstream & fileOut, char * reg)
 	}
 }
 
-
+//Modify the code so that if entered hex is of only 1 or 2 or 3 characters then output must be in 16 bit format only
 void hexToBinary(ofstream & fileOut,char * reg)
 {
 	for (int i = 0; reg[i] != '\0' ; ++i)
