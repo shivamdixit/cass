@@ -388,7 +388,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 	instructionLocationCounter+=4;
 	if(!isFirstPass)						//If second pass
 	{
-		while(1)
+		while(1)							//Loop to read register
 		{
 			if(sourceProgram[currentRow][currentIndex] == ',')
 				break;
@@ -396,7 +396,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				fprintf(stderr,"Error at line number : %d \nInvald", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -404,7 +404,7 @@ void interpretLDR(ofstream & fileOut, bool isFirstPass)
 		currentIndex++;
 		eatWhiteSpace();
 		i=0;
-		while(1)
+		while(1)							//Loop to read address in HEXADECIMAL FORMAT
 		{
 			if(sourceProgram[currentRow][currentIndex] == 'h' || sourceProgram[currentRow][currentIndex] == 'H' || sourceProgram[currentRow][currentIndex] == '\0')
 				break;
@@ -511,6 +511,13 @@ void interpretMAI(ofstream & fileOut,bool isFirstPass)
 	}
 }
 
+
+/**
+ *Function to interpret mneumonic "JZR"
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void interpretJZR(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0,ILC=0;
@@ -520,7 +527,7 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 	instructionLocationCounter+=4;
 	if(!isFirstPass)
 	{
-		while(1)
+		while(1)							//Loop to detect register used
 		{
 			if(sourceProgram[currentRow][currentIndex] == ',')
 				break;
@@ -536,7 +543,7 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 		currentIndex++;
 		eatWhiteSpace();
 		i=0;
-		while(1)
+		while(1)						//Loop to detect Label Name
 		{
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
@@ -557,6 +564,12 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 }
 
 
+/**
+ *Function to interpret mneumonic "JUM"
+ *@param 	ofstream& fileOut				//Output File stream
+ *@param 	bool isFirstPass				//First pass or second pass
+ *@return void
+ */
 void interpretJUM(ofstream & fileOut,bool isFirstPass)
 {
 	int i=0,ILC=0;
@@ -739,7 +752,7 @@ void interpretADD(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
