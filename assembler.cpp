@@ -125,7 +125,7 @@ int main(int argc, char const *argv[])
 	fileIn.open(inputFileName,ios::in);
 	if(!fileIn)
 	{
-		printf("Input file not found !!\n");
+		fprintf(stderr,"Input file not found !!\n");
 		return 1;
 	}
 
@@ -442,7 +442,7 @@ void interpretSTR(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -489,7 +489,7 @@ void interpretMAI(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -535,7 +535,7 @@ void interpretJZR(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -707,7 +707,7 @@ void interpretMVR(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -723,7 +723,7 @@ void interpretMVR(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -768,7 +768,7 @@ void interpretADD(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -797,7 +797,7 @@ void interpretSUB(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -813,7 +813,7 @@ void interpretSUB(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -842,7 +842,7 @@ void interpretMUL(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -858,7 +858,7 @@ void interpretMUL(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -887,7 +887,7 @@ void interpretDIV(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -903,7 +903,7 @@ void interpretDIV(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -932,7 +932,7 @@ void interpretMOD(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -948,7 +948,7 @@ void interpretMOD(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -985,7 +985,7 @@ void interpretSTI(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1001,7 +1001,7 @@ void interpretSTI(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1030,7 +1030,7 @@ void interpretNOT(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1062,7 +1062,7 @@ void interpretMOI(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1113,7 +1113,7 @@ void interpretINC(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1142,7 +1142,7 @@ void interpretDEC(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1173,7 +1173,7 @@ void interpretLOP(ofstream & fileOut,bool isFirstPass)
 			currentIndex++;
 			if(i>2)					//Implement exception handling
 			{
-				printf("Error at line number : %d \n", currentRow+1);
+				fprintf(stderr,"Error at line number : %d \n", currentRow+1);
 				exit(1);
 			}
 		}
@@ -1355,7 +1355,7 @@ void hexToBinary(ofstream & fileOut,char * reg)			//Its not register, but pointe
 						break;
 			case 'F' : fileOut<<"1111";
 						break;
-			default : printf("Error at line number : %d \nInvalid operands.\n",currentRow);
+			default : fprintf(stderr,"Error at line number : %d \nInvalid operands.\n",currentRow+1);
 		}
 	}
 }
