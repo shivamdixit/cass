@@ -10,7 +10,7 @@
  *			Anyone is free to contribute to this project
  *
  *
- ************************************************************************
+ *******************************************************************************************************************
  */
 
 
@@ -40,6 +40,7 @@ using namespace std;
  *Global Variables
  */
 int currentIndex=0,currentRow=0,instructionLocationCounter=0,symbTableCount=0;
+int verbosFlag=0;
 char sourceProgram[INPUT_HEIGHT][INPUT_WIDTH];		//Array to store source
 bool isEnd;					//To check if End Of File is reached
 int baseAddress=0;			//Base Address of the program after loading into memory
@@ -112,16 +113,42 @@ int main(int argc, char const *argv[])
 	ifstream fileIn;
 	ofstream fileOut;
 
+	if(argc <2)
+	{
+		printf("cass: Usage: %s input_file output_file\nFor help use %s --help\n",argv[0],argv[0]);
+		return 0;
+	}
+
+	if(!strcmp(argv[1],"--help"))
+	{
+		printf("\n\t\tcass: Usage: %s [options] input_file out_file\n\t\t[options]\t-v \t For verbose output\n\t\t\t\t--help \t For help and sample usage\n\n\t\tInput file must be present in same directory",argv[0]);
+		printf("\n\t\tNew line character \\r\\n\n\t\tMneumonics must begin with space\n\t\tLine containing Label should not contain any Mneumonic and must not begin with space\n\t\t");
+		printf("Address must be specified in 4bit hexadecimal format.\n\t\tImmediate data must be in Decimal\n\t\tSample Usage:\n\t\tSTART\n\t\t LDR A,2048H\n\t\t MVR B,A\n\t\t LOP A\n\t\t MUL C,B\n\t\t DEC B\n\t\t HLT\n\n");
+		exit(0);
+	}
+
 	if(argc <3)
 	{
 		printf("cass: Usage: %s input_file output_file\nFor help use %s --help\n",argv[0],argv[0]);
 		return 0;
 	}
 
-	inputFileName = argv[1];
-	outputFileName = argv[2];
-
-	//Label wali line cannot contain any other instruction
+	if(!strcmp(argv[1],"-v"))
+	{
+		verbosFlag=1;
+		if(argc<4)
+		{
+			printf("cass: Usage: %s input_file output_file\nFor help use %s --help\n",argv[0],argv[0]);
+			return 0;
+		}
+		inputFileName = argv[2];
+		outputFileName = argv[3];
+	}
+	else
+	{
+		inputFileName = argv[1];
+		outputFileName = argv[2];
+	}
 
 	fileIn.open(inputFileName,ios::in);
 	if(!fileIn)
@@ -147,8 +174,10 @@ int main(int argc, char const *argv[])
 	fileOut.open(outputFileName,ios::out);		//WARNING : This will destroy the previous contents of the file
 	stripNewLines(inputNumberOfLines);
 	parse(fileOut);
+	printf("Output successfully written to file \"%s\" \n",outputFileName);
 	return 0;
 }
+
 
 /**
  *Function to strip all new lines and comments
@@ -268,13 +297,16 @@ void insertInSymbolTable(char * name)
 		fprintf(stderr, "cass: Error at line number: %d\n Label Already used\n",currentRow+1);
 		exit(1);
 	}
-
 	symbolTable[index].ILC = instructionLocationCounter;	//Using Global ILC
 	for(i=0;name[i] !='\0';i++)		//Copying Label Name
 	{
 		symbolTable[index].label[i] =name[i];
 	}
 	symbolTable[index].label[i] = '\0'; //Inserting null char at the end
+	if(verbosFlag)
+	{
+		printf("\nLabel \"%s\" detected at Line number %d \nInstruction Location Counter: %d\n\n",name,currentRow+1,instructionLocationCounter );
+	}
 	index++;
 	symbTableCount = index;		//Global vairable symbTableCount to keep a count of total number of sym
 								//in symbol table
