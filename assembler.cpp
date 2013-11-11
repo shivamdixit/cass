@@ -161,7 +161,7 @@ int main(int argc, char const *argv[])
 	while(1)
 	{
 		if(inputNumberOfLines != 0)
-			fileIn.ignore();
+			fileIn.ignore();			//ignoring excess "\n"
 		fileIn.getline(sourceProgram[inputNumberOfLines],INPUT_WIDTH,'\r');
 		fflush(stdout);
 		fflush(stdin);
@@ -1559,7 +1559,13 @@ void regToBinary(ofstream & fileOut, char * reg)
  */
 void hexToBinary(ofstream & fileOut,char * reg)			//Its not register, but pointer to address
 {
-	for (int i = 0; reg[i] != '\0' ; ++i)
+	int i;
+	if(strlen(reg)!=4)
+	{
+		fprintf(stderr, "cass: Error at line number %d\nInvalid 16 bit address",currentRow+1);
+		exit(1);
+	}
+	for (i = 0; reg[i] != '\0' ; ++i)
 	{
 		switch(reg[i])
 		{
