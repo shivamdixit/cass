@@ -270,7 +270,7 @@ void insertInSymbolTable(char * name)
 	}
 
 	symbolTable[index].ILC = instructionLocationCounter;	//Using Global ILC
-	for(i=0;name[i] !=':';i++)		//Copying Label Name
+	for(i=0;name[i] !='\0';i++)		//Copying Label Name
 	{
 		symbolTable[index].label[i] =name[i];
 	}
@@ -662,11 +662,15 @@ void interpretJUM(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
-			eatWhiteSpace();
-			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			if(sourceProgram[currentRow][currentIndex] == ' ')
 			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
 				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
 				exit(1);
+				}
+				break;
 			}
 		}
 		label[i] = '\0';
@@ -698,11 +702,15 @@ void interpretJMC(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
-			eatWhiteSpace();
-			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			if(sourceProgram[currentRow][currentIndex] == ' ')
 			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
 				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
 				exit(1);
+				}
+				break;
 			}
 		}
 		label[i] = '\0';
@@ -734,11 +742,15 @@ void interpretJMZ(ofstream & fileOut,bool isFirstPass)
 			if(sourceProgram[currentRow][currentIndex] == '\0')
 				break;
 			label[i++] = sourceProgram[currentRow][currentIndex++];
-			eatWhiteSpace();
-			if(sourceProgram[currentRow][currentIndex] != ';' && sourceProgram[currentRow][currentIndex] != '\0')
+			if(sourceProgram[currentRow][currentIndex] == ' ')
 			{
+				eatWhiteSpace();
+				if(sourceProgram[currentRow][currentIndex] != '\0')
+				{
 				fprintf(stderr,"Error at line number : %d \nInvald Register\n", currentRow+1);
 				exit(1);
+				}
+				break;
 			}
 		}
 		label[i] = '\0';
