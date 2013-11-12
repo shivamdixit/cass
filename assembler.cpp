@@ -6,7 +6,7 @@
  *
  *@description CASS is an open source assembler written in C++ for our
  *				ISA which is designed during a project in COA Course
- *@authors 	Shivam Dixit, Ritesh Agrawal, Prasham Gupta, Parag Jain
+ *@authors 	Shivam Dixit, Ritesh Agrawal
  *			Anyone is free to contribute to this project
  *
  *
