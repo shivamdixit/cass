@@ -21,3 +21,8 @@ Usage: ./a.out [options] input_file out_file
 		 MUL C,B
 		 DEC B
 		 HLT
+
+
+### Authors
+Shivam Dixit
+Ritesh Agrawal
